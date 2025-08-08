@@ -19,8 +19,3 @@ This project focuses on constructing an optimal financial portfolio by selecting
 - Scikit-learn
 - Matplotlib / Plotly
 - YFinance or other financial APIs
-
----
-
-## 🧪 Project Structure
-
