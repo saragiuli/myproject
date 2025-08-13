@@ -10,7 +10,8 @@ from scipy.optimize import minimize
 
 
 '''
-pesi attuali di Robo4 Revoulut
+pesi attuali 
+
 
 '500X.AS' -- SPDR S&P 500 ESG Leaders ETF--50%
 
@@ -23,14 +24,15 @@ pesi attuali di Robo4 Revoulut
 'UIMT.DE' -- UBS MSCI Pacific Socially Responsible (Dist) ETF -- 2,98%
 
 '''
-tickers = ['500X.AS', 'XDWT.MI', 'UIMM.DE', 'MIVB.DE', 'UIMT.DE']
+# tickers = ['500X.AS', 'XDWT.MI', 'UIMM.DE', 'MIVB.DE', 'UIMT.DE'] tickers veri da inserire (capire perchè non li scarica)
 
-#tickers = ['^GSPC','GC=F']
+tickers = ["MSFT","TSLA", "KO"]
+df = yf.download(tickers,start='2025-05-01', auto_adjust=False)
+#df.xs('AAPL', axis = 1, level = 'Ticker')
 
-
-df = yf.download(tickers,start='2010-01-01', threads=False)['Close']
 
 print(df.head(10))
+
 
 
 ret_df = np.log(df/df.shift(1))
@@ -44,26 +46,31 @@ print("return_df_mean\n", ret_df.mean())
 print("return_df_std\n", ret_df.std())
 
 
+# compute weights (equally weighted portfolio)
+
 W = np.ones(len(ret_df.columns))/ np.ones(len(ret_df.columns)).sum()
 
 print("\n ptf equally weighted\n", W)
 
-# return of ptf
-
+# RETURN OF PTF
 
 ret_1 = (W * ret_df.mean()).sum()
 print("\n ret of ptf \n", ret_1)
 
 
-def sharpe_pf(W, returns):
-    pf_risk = (W.T.dot(returns.cov()).dot(W)) ** 0.5
-    SR = W.T.dot(returns.mean()) / pf_risk
+# RISK OF PTF
+
+ptf_risk = (W.dot(ret_df.cov().dot(W)))**(1/2)
+print("\n ptf_risk of ptf \n", ptf_risk)
+
+
+def sharpe_pf(W, returns, ptf_risk):
+    SR = W.T.dot(returns.mean()) / ptf_risk
     return -SR
 
 
 
-
-print("\n Sharpe of PTF\n", sharpe_pf(W, ret_df))
+print("\n Sharpe of PTF\n", sharpe_pf(W, ret_df, ptf_risk))
 
 cons = ({"type":"eq", 
          "fun": lambda x: np.sum(x)-1})
